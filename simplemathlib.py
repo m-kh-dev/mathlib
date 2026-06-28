@@ -258,3 +258,5 @@ def normalized(self):
     return self/abs(self)
 def normalize(self):
     self /= abs(self)
+
+
