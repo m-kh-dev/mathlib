@@ -1,6 +1,9 @@
 import simplemathlib as sml
 
-t = sml.Complex(2,5)
-print(t)
-z = sml.ComplexfromAngle(2,2)
-print(z)
+v1 = sml.Vector2(3.0,4.0)
+v2 = sml.Vector2(5,0)
+print(v1)
+print(v2)
+print(v2.normalized())
+print(v1.innerProduct(v2))
+print(v1.crossProduct(v2))
