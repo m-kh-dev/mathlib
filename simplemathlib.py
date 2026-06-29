@@ -1,7 +1,7 @@
 #this is a library ive been working on for quite a bit
 #its a basic non bloated but probably slow math library
 from typing import List, Any, Optional
-from math import atan, sin, cos, sqrt, acos
+from math import atan, sin, cos, sqrt, acos, copysign
 import ctypes as ct
 
 REAL = float|int
@@ -13,14 +13,17 @@ AXIES = {
     "w" : 3
 }
 
+
+def sign(n) -> int: 
+    """Returns 0 if - and 1 if +"""
+    return copysign(1.0,n) + 1.0
+
 def range_calc(list,delta,N,start):
-    mult = 1
     chips = delta / N
     range_list = [start]
     __start__ = list[0]
     for i in range(N):
-        range_list.append(start + (chips * mult))
-        mult = mult + 1
+        range_list.append(start + (chips * (i+1)))
     
     return range_list
 
@@ -35,8 +38,9 @@ class array():
             ValueError
         contaner.append(item)
 
-
 class Complex():
+    """a complex number of the format a + bi"""
+    i = None
     def __init__(self, R : Optional[REAL], C : Optional[REAL]):
         self.a = R if (R!=None) else 0.0
         self.b = C if (C!=None) else 0.0
@@ -86,11 +90,13 @@ class Complex():
     def conjugate(self : Complex):
         return Complex(self.a, -self.b)
     def __str__(self : Complex):
-        return(f"""{self.a} + {self.b}i""")
+        return(f"""{self.a} {"+"*sign(self.b)} {self.b}i""")
     def fromAngle(a : Optional[REAL], r : Optional[REAL]):
         return (Complex(cos(a),sin(a))*r)
     def __abs__(self : Complex):
         return sqrt(self.a**2 + self.b**2)
+
+Complex.i = Complex(0,1)
 
 def toVector(self : Complex):
     return Vector([self.a, self.b])
@@ -212,9 +218,18 @@ class Vector():
         return self
     def AngleBetweenVectors(self : Vector,other : Vector):
         return acos(innerProduct(self,other)/(self.magnitude*other.magnitude))
+    def AngleBetweenVectors(self : Vector,other : Vector):
+        return acos(innerProduct(self,other)/(self.magnitude*other.magnitude))
+    def addScaledVector(self : Vector, other : Vector, scale : REAL):
+        return self + scale*other
+    def perpendicularToVector(self : Vector, other: Vector):
+        return (innerProduct(self,other) == 0.0)
+
 
 
 class Vector2(Vector):
+    i = None
+    j = None
     def __init__(self, x : Optional[REAL], y : Optional[REAL]):
         c1 = x if x!=None else 0.0
         c2 = y if y!=None else x
@@ -230,7 +245,11 @@ class Vector2(Vector):
         return self
     def toComplex(self):
         return Complex(self.x,self.y)
+
 class Vector3(Vector):
+    i = None
+    j = None
+    k = None
     def __init__(self, x : Optional[REAL], y : Optional[REAL], z : Optional[REAL]):
         c1 = x if x!=None else 0.0
         c2 = y if y!=None else x
@@ -249,7 +268,14 @@ class Vector3(Vector):
         self.array = (self**other).array
         return self
     
-    
+
+Vector2.i = Vector2(1.0, 0.0)
+Vector2.j = Vector2(0.0, 1.0)
+
+Vector3.i = Vector3(1.0, 0.0, 0.0)
+Vector3.j = Vector3(0.0, 1.0, 0.0)
+Vector3.k = Vector3(0.0, 0.0, 1.0)
+
 def crossProduct(self : Vector2|Vector3, other : Vector2|Vector3):
         if(isinstance(self,Vector2),isinstance(other,Vector2)):
             return (self.x*other.y) - (self.y*other.x)
